@@ -2,16 +2,16 @@
 <?php
 require_once 'autoload.php';
 
-class WPI_Parser extends bindata
+class wpi extends bindata
 {
-  function WPI_Parser($filename)
+  function wpi($filename)
   {
     $this->load($filename);
   }
 
   function process()
   {
-    $ret=new WPI_Drawing();
+    $ret=new wpiDrawing();
     $unknownPurpose=$this->popBlock(2059);
     while(!$this->eof()) {
       $blockDescription=$this->popLittleEndian(1);
@@ -21,10 +21,10 @@ class WPI_Parser extends bindata
       $body=new bindata($blockBody);
       switch($blockDescription)
       {
-        case 241: // Stroke WPI_Layer Description
+        case 241: // Stroke wpiLayer Description
           switch($body->popChar())
           {
-            case 128: // New WPI_Layer
+            case 128: // New wpiLayer
               $ret->addLayer();
               break;
             case 01: // Start Stroke
@@ -57,14 +57,14 @@ class WPI_Parser extends bindata
 }
 
 /*main*/
-$parser=new WPI_Parser('SKETCH11.WPI');
+$parser=new wpi('SKETCH11.WPI');
 $drawing=$parser->process();
-$renderer=new WPI_Renderer($drawing);
+$renderer=new wpiRenderer($drawing);
 $renderer->toSVG('some.svg');
 
-class WPI_Layer
+class wpiLayer
 {
-  function WPI_Layer()
+  function wpiLayer()
   {
     $this->strokes=array();
   }
@@ -105,17 +105,17 @@ class WPI_Layer
   }
 }
 
-class WPI_Drawing
+class wpiDrawing
 {
-  function WPI_Drawing()
+  function wpiDrawing()
   {
     $this->idx=0;
-    $this->layers=array(new WPI_Layer());
+    $this->layers=array(new wpiLayer());
   }
 
   function addLayer()
   {
-    $this->layers[]=new WPI_Layer();
+    $this->layers[]=new wpiLayer();
     $this->idx++;
   }
 
@@ -175,9 +175,9 @@ class WPI_Drawing
   }
 }
 
-class WPI_Renderer
+class wpiRenderer
 {
-  function WPI_Renderer($drawing)
+  function wpiRenderer($drawing)
   {
     $this->drawing=$drawing;
     $this->title='';
