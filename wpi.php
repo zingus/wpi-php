@@ -189,7 +189,7 @@ class WPI_Renderer
     list($x1,$y1,$x2,$y2)=$this->findRange();
     $w=$x2-$x1; $W=$w+10; $Wcm='21cm';
     $h=$y2-$y1; $H=$h+10; $Hcm=(21*$h/$w).'cm';
-    $d="M 100 100 L 300 100 L 200 300 z";
+    $d="M 100 100 L 300 100 L 200 300 z"; // TODO actual rendering
     $ret="<?xml version='1.0' standalone='no'?>
 <!DOCTYPE svg PUBLIC '-//W3C//DTD SVG 1.1//EN' 'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'>
 <svg width='$Wcm' height='$Hcm' viewBox='0 0 $W $H' xmlns='http://www.w3.org/2000/svg' version='1.1'><title>{$this->title}</title><desc>{$this->desc}</desc>
