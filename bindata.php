@@ -22,7 +22,7 @@ class bindata
     $this->data=file_get_contents($filename);
   }
 
-  function popBlock($len)
+  function readBlock($len)
   {
     $i=$this->idx;
     $this->idx+=$len;
@@ -36,10 +36,10 @@ class bindata
     $this->idx+=$len;
   }
 
-  function popLittleEndian($len)
+  function readLittleEndian($len)
   {
     $ret=0;
-    $data=$this->popBlock($len);
+    $data=$this->readBlock($len);
     for($i=0;$i<$len;$i++)
     {
       $ret+=ord($data[$i]);
@@ -47,10 +47,10 @@ class bindata
     return $ret;
   }
 
-  function popBigEndian($len)
+  function readBigEndian($len)
   {
     $ret=0;
-    $data=$this->popBlock($len);
+    $data=$this->readBlock($len);
     for($i=$len-1;$i>=0;$i--)
     {
       $ret+=ord($data[$i]);
@@ -58,29 +58,29 @@ class bindata
     return $ret;
   }
 
-  function popShort()
+  function readShort()
   {
-    return $this->popLittleEndian(2);
+    return $this->readLittleEndian(2);
   }
 
-  function popNetworkShort()
+  function readNetworkShort()
   {
-    return $this->popBigEndian(2);
+    return $this->readBigEndian(2);
   }
 
-  function popInt()
+  function readInt()
   {
-    return $this->popLittleEndian(4);
+    return $this->readLittleEndian(4);
   }
 
-  function popNetworkInt()
+  function readNetworkInt()
   {
-    return $this->popBigEndian(4);
+    return $this->readBigEndian(4);
   }
 
-  function popChar()
+  function readByte()
   {
-    return $this->popLittleEndian(1);
+    return $this->readLittleEndian(1);
   }
 
   function eof()

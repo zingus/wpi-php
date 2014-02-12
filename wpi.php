@@ -12,17 +12,17 @@ class wpi extends bindata
   function process()
   {
     $ret=new wpiDrawing();
-    $unknownPurpose=$this->popBlock(2059);
+    $unknownPurpose=$this->readBlock(2059);
     while(!$this->eof()) {
-      $blockDescription=$this->popLittleEndian(1);
-      $blockSize=$this->popLittleEndian(1);
+      $blockDescription=$this->readLittleEndian(1);
+      $blockSize=$this->readLittleEndian(1);
       // $blockSize is the length of the block WITH the 2-bytes header
-      $blockBody=$this->popBlock($blockSize-2);
+      $blockBody=$this->readBlock($blockSize-2);
       $body=new bindata($blockBody);
       switch($blockDescription)
       {
         case 241: // Stroke wpiLayer Description
-          switch($body->popChar())
+          switch($body->readByte())
           {
             case 128: // New wpiLayer
               $ret->addLayer();
@@ -38,14 +38,14 @@ class wpi extends bindata
           }
           break;
         case  97: // Pen XY Data
-          $ret->addPoint($body->popNetworkShort(),$body->popNetworkShort());
+          $ret->addPoint($body->readNetworkShort(),$body->readNetworkShort());
           break;
         case 100: // Pen Pressure
           $body->skipBlock(2); // skip a cuppa bytes (IDK why)
-          $ret->addPressure($body->popNetworkShort());
+          $ret->addPressure($body->readNetworkShort());
           break;
         case 101: // Pen Tilt
-          $ret->addTilt($body->popNetworkShort());
+          $ret->addTilt($body->readNetworkShort());
           break;
         default : // All Others
           // fuck'em
@@ -67,11 +67,13 @@ class wpiLayer
   function wpiLayer()
   {
     $this->strokes=array();
+    $this->idx=0;
   }
 
   function startStroke()
   {
-    $this->strokes[]=array('S');
+    $this->strokes[]=new wpiStroke();
+    $this->idx++;
   }
 
   function endStroke()
@@ -102,6 +104,38 @@ class wpiLayer
       $ret.=implode(' ',$v)."\n";
     }
     return $ret;
+  }
+
+  function currentStroke()
+  {
+    return $this->stroke[$this->idx];
+  }
+}
+
+class wpiStroke
+{
+  function wpiStroke()
+  {
+    $this->coordX   = array();
+    $this->coordY   = array();
+    $this->pressure = array();
+    $this->tilt     = array();
+  }
+
+  function addPoint($x,$y)
+  {
+    $this->coordX[]=$x;
+    $this->coordY[]=$y;
+  }
+
+  function addPressure($pressure)
+  {
+    $this->pressure[]=$pressure;
+  }
+
+  function addTilt($tilt)
+  {
+    $this->tilt[]=$tilt;
   }
 }
 
@@ -153,7 +187,7 @@ class wpiDrawing
   {
     return $this->layers[$this->idx];
   }
-
+  
   function __tostring()
   {
     $ret='';
@@ -169,7 +203,7 @@ class wpiDrawing
     $ret=array();
     foreach($this->layers as $layer)
     {
-      array_splice($ret,count($ret),0,$layer->strokes);
+      array_splice($ret,count($ret),0,$layer->strokes); // append
     }
     return $ret;
   }
