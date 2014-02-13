@@ -38,7 +38,9 @@ class wpi extends bindata
           }
           break;
         case  97: // Pen XY Data
-          $ret->addPoint($body->readNetworkShort(),$body->readNetworkShort());
+          $x=$body->readNetworkShort();
+          $y=$body->readNetworkShort();
+          $ret->addPoint($x,$y*2+5);
           break;
         case 100: // Pen Pressure
           $body->skipBlock(2); // skip a cuppa bytes (IDK why)
@@ -255,9 +257,10 @@ class wpiRenderer
     foreach($drawing->strokes() as $stroke) {
       $d='';
       foreach($stroke->coordX as $k=>$x) {
+        if($stroke->pressure[$k]<100) continue; // ignore point with a low pressure
         $y=$stroke->coordY[$k];
         if($k==0)
-          $d.="M $x $y S $x $y ";
+          $d.="M $x $y L $x $y ";
         // normalize coords
         $x-=$x1;
         $y-=$y1;
