@@ -269,7 +269,9 @@ class wpiRenderer
         $d.="$x $y ";
       }
       $d.='z';
-      $color='#'.substr(md5($k),0,6);
+      //$color='#'.substr(md5($k),0,6);
+      $r=($k<16?'0':'').strtoupper(dechex(255-$k%255));
+      $color="#{$r}00{$r}";
       $paths.="<path d='$d' fill='none' stroke='$color' stroke-width='1' />\n";
     }
     $ret="<?xml version='1.0' standalone='no'?>
